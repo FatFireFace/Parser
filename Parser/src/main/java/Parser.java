@@ -9,6 +9,8 @@ import java.util.regex.Pattern;
 
 public class Parser {
 
+    final String VARIABLE_DEF = "<\\s*1>\\s*<0x[0-9a-fA-F]+>\\s*DW_TAG_variable";
+
 
     protected Type defineType(String[] array){
 
@@ -33,38 +35,45 @@ public class Parser {
     return type;
     }
 
-    protected Variable parseVariable(){
+    protected Variable defineVariable(String[] array){
+
+
 
     return null;
     }
 
 
-    public List<Variable> parseElf(File elfFile){
+    public List<Variable> parseElf(File elfFile) {
         String filePath = elfFile.getPath();
-            try {
-                BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath));
-                bufferedReader.mark(256);
-                String line;
-                line = bufferedReader.readLine();
-                List<Type> listOfTypes = new ArrayList<>();
-
-                    while(line != null){
-                        if (line.contains("DW_TAG_base_type")){
-                            String[] array = new String[4];
-                            for (int i = 0; i<4; i++){
-                               array[i] = line;
-                               line = bufferedReader.readLine();
-                            }
-                        listOfTypes.add(defineType(array));
-                        }
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath));
+            String line;
+            line = bufferedReader.readLine();
+            List<Type> listOfTypes           = new ArrayList<>();
+            List<Variable> listOfVariables   = new ArrayList<>();
+            while (line != null) {
+                if (line.contains("DW_TAG_base_type")) {
+                    String[] array = new String[4];
+                    for (int i = 0; i < 4; i++) {
+                        array[i] = line;
+                        line = bufferedReader.readLine();
                     }
+                    listOfTypes.add(defineType(array));
+                }
+
+                if (line.contains(VARIABLE_DEF)) {
+                    String[] array = new String[6];
 
 
-
+                listOfVariables.add(defineVariable(array));
+                }
             }
-            catch (IOException e){
-                e.printStackTrace();
-            }
-    return null;
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
+
